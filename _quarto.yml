@@ -1,0 +1,35 @@
+project:
+  type: book
+  output-dir: docs
+  
+execute: 
+  warning: FALSE
+  message: FALSE
+  cache: true
+  freeze: auto
+
+comments:
+  hypothesis: 
+    theme: clean
+
+book:
+  title: "Groundwater and Stream Temperature"
+  author: "Jeff Baldock et al."
+  date: today
+  chapters:
+    - index.qmd
+
+format:
+  html:
+    theme: 
+      light: cosmo
+      dark: darkly
+    code-fold: true
+    code-tools: true
+    code-overflow: wrap
+    number-depth: 4
+      
+  pdf:
+    documentclass: scrreprt
+
+editor: source
