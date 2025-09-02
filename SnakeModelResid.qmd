@@ -425,4 +425,142 @@ efftib %>%
 ```
 
 
+## Model RMSE
 
+Alternatively, we can model monthly RMSE, rather than the raw residuals. This eliminates the need for an autocorrelation term and is based on a coarser measure of predictive accuracy (is using/modeling all residuals pseudoreplication), but limits our ability to discriminate between under vs over-estimates/predictions. 
+
+### Monthly models
+
+Summarize data by site, year, and month
+```{r}
+errorterms <- dat %>%
+  group_by(site, year, tim.month) %>%
+  summarize(gw_influence = mean(gw_influence),
+            h2oAreaKm2_log = mean(h2oAreaKm2_log),
+            forest_buff_perc = mean(forest_buff_perc),
+            h2o_slope_mean = mean(h2o_slope_mean),
+            h2o_elev_mean = mean(h2o_elev_mean),
+            sampsize = n(),
+            rmse = sqrt(mean((model_resid)^2)),
+            mae = mean(abs(model_resid))) %>%
+  ungroup() %>%
+  filter(sampsize >= 28)
+```
+
+RMSE by groundwater and month
+```{r fig.width=7, fig.height=7}
+errorterms %>%
+  ggplot(aes(x = gw_influence, y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(~tim.month) + 
+  theme_bw()
+```
+
+Fit linear mixed effects models in a loop, independently for each month: RMSE as a function of site-level groundwater influence and random intercepts for year
+```{r}
+modlist <- list()
+for (i in 1:12) {
+  modlist[[i]] <- lmer(rmse ~ gw_influence + (1|year), data = errorterms %>% filter(tim.month == i))
+}
+
+# empty tibble to store coefficients
+efftib <- tibble(month = 1:12, 
+                 mean.gw = rep(NA, 12),
+                 lower.gw = rep(NA, 12),
+                 upper.gw = rep(NA, 12))
+
+# get coefficients, means and 95% confidence intervals
+for (i in 1:12) {
+  efftib$mean.gw[i] <- fixef(modlist[[i]])[2]
+  efftib$lower.gw[i] <- confint(modlist[[i]])[4,1]
+  efftib$upper.gw[i] <- confint(modlist[[i]])[4,2]
+}
+
+# plot groundwater effects
+efftib %>%
+  ggplot() +
+  geom_point(aes(x = month, y = mean.gw)) +
+  geom_errorbar(aes(x = month, ymin = lower.gw, ymax = upper.gw), width = 0.4) +
+  geom_abline(intercept = 0, slope = 0, linetype = "dashed") +
+  theme_bw() + theme(panel.grid = element_blank()) + 
+  ylab("Effect of groundwater on model RMSE") +
+  scale_x_continuous(breaks = c(1:12))
+```
+
+
+### Interaction model
+
+Same, but different: model the interaction between month and groundwater directly:
+```{r}
+# errorterms %>% 
+#   group_by(tim.month) %>%
+#   summarize(rmse = mean(rmse)) %>%
+#   ggplot(aes(x = tim.month, y = rmse)) +
+#   geom_point() +
+#   geom_line() +
+#   theme_bw() + theme(panel.grid = element_blank()) +
+#   xlab("Month") + ylab("Mean RMSE") +
+#   scale_x_continuous(breaks = c(1:12))
+
+errorterms %>% 
+  #filter(gw_influence < 0.15) %>%
+  ggplot(aes(x = tim.month, y = rmse, color = gw_influence)) + 
+  geom_point() +
+  geom_line(aes(group = interaction(site, year), color = gw_influence)) +
+  theme_bw() + theme(panel.grid = element_blank()) +
+  xlab("Month") + ylab("RMSE") +
+  scale_x_continuous(breaks = c(1:12))
+```
+
+Based on the plot of the data above, fit a linear interaction model with second order polynomial for groundwater influence:
+```{r}
+mymod <- lm(rmse ~ gw_influence + tim.month + I(tim.month^2) + gw_influence*tim.month + gw_influence*I(tim.month^2), data = errorterms)
+summary(mymod)
+```
+
+Plot the model predictions:
+```{r}
+mymonths <- seq(from = 1, to = 12, length.out = 100)
+preds_gw0 <- predict(mymod, newdata = list(gw_influence = rep(0, times = 100), tim.month = mymonths),
+                     interval = "confidence", level = 0.95)
+preds_gw1 <- predict(mymod, newdata = list(gw_influence = rep(1, times = 100), tim.month = mymonths),
+                     interval = "confidence", level = 0.95)
+
+ggplot() + 
+  geom_ribbon(aes(x = mymonths, ymin = preds_gw0[,2], ymax = preds_gw0[,3]), 
+              color = NA, fill = "grey30", alpha = 0.3) +
+  geom_ribbon(aes(x = mymonths, ymin = preds_gw1[,2], ymax = preds_gw1[,3]), 
+              linewidth = 1, color = NA, fill = "dodgerblue3", alpha = 0.3) +
+  geom_line(aes(x = mymonths, y = preds_gw0[,1]), linewidth = 1, color = "grey30") +
+  geom_line(aes(x = mymonths, y = preds_gw1[,1]), linewidth = 1, color = "dodgerblue3") +
+  theme_bw() + theme(panel.grid = element_blank()) +
+  xlab("Month") + ylab("RMSE") +
+  scale_x_continuous(breaks = c(1:12))
+```
+
+
+Derive the month-specific effect of groundwater on RMSE
+```{r}
+mygw <- seq(from = 0, to = 1, length.out = 100)
+predlist <- list()
+for (i in 1:12) {
+  preds <- predict(mymod, newdata = list(gw_influence = mygw, tim.month = rep(i, times = 100)),
+                   interval = "confidence", level = 0.95)
+  predlist[[i]] <- tibble(month = rep(i, times = 100),
+                          gw = mygw,
+                          fit = preds[,1],
+                          lwr = preds[,2],
+                          upr = preds[,3])
+}
+predtib <- bind_rows(predlist)
+
+predtib %>%
+  ggplot(aes(x = gw, y = fit, group = as.factor(month), color = as.factor(month))) +
+  geom_line(linewidth = 1) +
+  theme_bw() + theme(panel.grid = element_blank()) +
+  xlab("Groundwater influence") + ylab("RMSE")
+```
+
+
+*Note that these results generally match those above (results from the monthly RMSE models), but packages everything into a single model statement.*
