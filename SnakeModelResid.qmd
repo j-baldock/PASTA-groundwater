@@ -1,0 +1,428 @@
+---
+title: "Snake model residuals"
+---
+
+**Purpose:** Explore the relationship between residuals from K. Gauthier's daily stream temperature model and independent metrics of groundwater availability. This is somewhat complicated by the fact that Kevin's model already uses groundwater availability as a covariate, so we really aren't evaluating how much additional information the groundwater metric adds, but rather the variance that isn't explained by the existing metric (e.g., driven by spatial/temporal variation in groundwater temperature, lagged groundwater temperature signals, etc.).
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(ggforce)
+library(lme4)
+library(egg)
+library(GGally)
+```
+
+
+## Data
+
+Load data from Kevin's temp model: 
+```{r}
+dat <- read_csv("Stream temperature/model_obs_pred_data.csv") %>% 
+  mutate(model_resid = model_pred - meanT,
+         year = as.factor(year(date))) %>%
+  group_by(site, year) %>%
+  mutate(model_resid_lag = lag(model_resid)) %>%
+  ungroup()
+
+head(dat)
+length(unique(dat$site))
+```
+
+
+## Summarize error
+
+"Global" RMSE
+```{r}
+sqrt(mean((dat$model_resid)^2))
+```
+
+"Global" mean absolute error
+```{r}
+mean(abs(dat$model_resid))
+```
+
+Plot relationships between model error (RMSE and MAE) and site-specific covariates
+```{r fig.width=6, fig.height=12}
+errorterms <- dat %>%
+  group_by(site) %>%
+  summarize(gw_influence = mean(gw_influence),
+            h2oAreaKm2_log = mean(h2oAreaKm2_log),
+            forest_buff_perc = mean(forest_buff_perc),
+            h2o_slope_mean = mean(h2o_slope_mean),
+            h2o_elev_mean = mean(h2o_elev_mean),
+            sampsize = n(),
+            rmse = sqrt(mean((model_resid)^2)),
+            mae = mean(abs(model_resid))) %>%
+  ungroup()
+
+# RMSE
+p1 <- errorterms %>%
+  ggplot(aes(x = log(gw_influence), y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("log(Groundwater influence)") + ylab("RMSE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p2 <- errorterms %>%
+  ggplot(aes(x = h2oAreaKm2_log, y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("log(Catchment area)") + ylab("RMSE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p3 <- errorterms %>%
+  ggplot(aes(x = forest_buff_perc, y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Forest cover (% in buffer)") + ylab("RMSE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p4 <- errorterms %>%
+  ggplot(aes(x = h2o_slope_mean, y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Mean catchment slope") + ylab("RMSE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p5 <- errorterms %>%
+  ggplot(aes(x = h2o_elev_mean, y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Mean catchment elevation") + ylab("RMSE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p6 <- errorterms %>%
+  ggplot(aes(x = log(sampsize), y = rmse)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("log(Sample size)") + ylab("RMSE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+
+# Mean Absolute Error
+p1b <- errorterms %>%
+  ggplot(aes(x = log(gw_influence), y = mae)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("log(Groundwater influence)") + ylab("MAE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p2b <- errorterms %>%
+  ggplot(aes(x = h2oAreaKm2_log, y = mae)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("log(Catchment area)") + ylab("MAE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p3b <- errorterms %>%
+  ggplot(aes(x = forest_buff_perc, y = mae)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Forest cover (% in buffer)") + ylab("MAE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p4b <- errorterms %>%
+  ggplot(aes(x = h2o_slope_mean, y = mae)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Mean catchment slope") + ylab("MAE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p5b <- errorterms %>%
+  ggplot(aes(x = h2o_elev_mean, y = mae)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Mean catchment elevation") + ylab("MAE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+p6b <- errorterms %>%
+  ggplot(aes(x = log(sampsize), y = mae)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("log(Sample size)") + ylab("MAE") +
+  theme_bw() + theme(panel.grid = element_blank())
+
+# combine plots
+ggarrange(p1, p1b, 
+          p2, p2b, 
+          p3, p3b,
+          p4, p4b,
+          p5, p5b,
+          p6, p6b, nrow = 6, ncol = 2, byrow = TRUE)
+  
+```
+
+View pairs plots among site-specific covariates (some potential multicollinearity)
+```{r fig.width=7, fig.height=7}
+ggpairs(errorterms %>% select(2:7))
+```
+
+Simple linear model quantifying the effect of site-specific covariates on model RMSE
+```{r}
+summary(lm(rmse ~ gw_influence + h2oAreaKm2_log + forest_buff_perc + h2o_slope_mean + h2o_elev_mean + sampsize, data = errorterms))
+```
+
+
+## Visualize residuals
+
+### Obs. and preds - scatter
+
+```{r}
+dat %>%
+  ggplot(aes(x = meanT, y = model_pred)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  theme_bw() + theme(panel.grid = element_blank()) +
+  xlab("Observed temperature") + ylab("Predicted temperature")
+```
+
+```{r}
+p <- dat %>%
+  ggplot(aes(x = meanT, y = model_pred)) +
+  geom_point(aes(color = year), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  theme_bw() + theme(panel.grid = element_blank()) +
+  xlab("Observed temperature") + ylab("Predicted temperature") +
+  facet_wrap_paginate(~site, ncol = 3, nrow = 4, scales = "free_x")
+n_pages(p)
+```
+
+::: panel-tabset
+
+#### p1
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 1)
+```
+
+#### p2
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 2)
+```
+
+#### p3
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 3)
+```
+
+#### p4
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 4)
+```
+
+#### p5
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 5)
+```
+
+#### p6
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 6)
+```
+
+#### p7
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 7)
+```
+
+:::
+
+
+
+
+### Obs. and preds - time series
+
+View time series with observations (**black text**) and model predictions ([**red text**]{style="color: red;"})
+```{r}
+p <- dat %>% 
+  ggplot() +
+  geom_line(aes(x = date, y = meanT)) + 
+  geom_line(aes(x = date, y = model_pred), color = "red") +
+  theme_bw() +
+  facet_wrap_paginate(~site, ncol = 3, nrow = 4, scales = "free_x")
+n_pages(p)
+```
+
+::: panel-tabset
+
+#### p1
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 1, scales = "free_x")
+```
+
+#### p2
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 2, scales = "free_x")
+```
+
+#### p3
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 3, scales = "free_x")
+```
+
+#### p4
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 4, scales = "free_x")
+```
+
+#### p5
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 5, scales = "free_x")
+```
+
+#### p6
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 6, scales = "free_x")
+```
+
+#### p7
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 7, scales = "free_x")
+```
+
+:::
+
+
+### Residuals - time series
+
+View all time series of residuals together
+```{r}
+dat %>%
+  ggplot(aes(x = DOY, y = model_resid)) + 
+  geom_point()
+```
+
+
+Facet by site, color by year:
+```{r}
+p <- dat %>% 
+  ggplot() +
+  geom_line(aes(x = DOY, y = model_resid, color = year)) +
+  geom_abline(intercept = 0, slope = 0, linetype = "dashed") +
+  theme_bw() +
+  facet_wrap_paginate(~site, ncol = 3, nrow = 4)
+n_pages(p)
+```
+
+::: panel-tabset
+
+#### p1
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 1)
+```
+
+#### p2
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 2)
+```
+
+#### p3
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 3)
+```
+
+#### p4
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 4)
+```
+
+#### p5
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 5)
+```
+
+#### p6
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 6)
+```
+
+#### p7
+```{r fig.width=8, fig.height=10}
+p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 7)
+```
+
+:::
+
+
+Annual pattern of residuals is generally consistent among years, within sites. Strong autocorrelation
+
+
+
+## Model residuals
+
+Absolute residuals by groundwater input
+```{r}
+summary(lm(abs(model_resid) ~ abs(model_resid_lag) + gw_influence, data = dat))
+
+dat %>%
+  ggplot(aes(x = gw_influence, y = abs(model_resid))) +
+  geom_point() +
+  theme(legend.position = "none") +
+  geom_smooth(method = "lm")
+```
+
+
+Residuals by groundwater and month
+```{r fig.width=7, fig.height=7}
+dat %>%
+  ggplot(aes(x = gw_influence, y = model_resid)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(~tim.month) + 
+  theme_bw()
+```
+
+
+Explore time varying effects of groundwater on model residuals (linear mixed effects model includes lagged/autocorrelation term and random intercepts for year).
+```{r}
+# fit mixed effects models in a loop, independently for each month: residuals as a function of lagged residuals, site-level groundwater influence, and random intercepts for year
+modlist <- list()
+for (i in 1:12) {
+  modlist[[i]] <- lmer(model_resid ~ model_resid_lag + gw_influence + (1|year), data = dat %>% filter(tim.month == i))
+}
+
+# empty tibble to store coefficients
+efftib <- tibble(month = 1:12, 
+                 mean.gw = rep(NA, 12),
+                 lower.gw = rep(NA, 12),
+                 upper.gw = rep(NA, 12), 
+                 
+                 mean.ac = rep(NA, 12),
+                 lower.ac = rep(NA, 12),
+                 upper.ac = rep(NA, 12))
+
+# get coefficients, means and 95% confidence intervals
+for (i in 1:12) {
+  efftib$mean.gw[i] <- fixef(modlist[[i]])[3]
+  efftib$lower.gw[i] <- confint(modlist[[i]])[5,1]
+  efftib$upper.gw[i] <- confint(modlist[[i]])[5,2]
+  
+  efftib$mean.ac[i] <- fixef(modlist[[i]])[2]
+  efftib$lower.ac[i] <- confint(modlist[[i]])[4,1]
+  efftib$upper.ac[i] <- confint(modlist[[i]])[4,2]
+}
+
+# plot autocorrelation terms
+efftib %>%
+  ggplot() +
+  geom_point(aes(x = month, y = mean.ac)) +
+  geom_errorbar(aes(x = month, ymin = lower.ac, ymax = upper.ac), width = 0.4) +
+  geom_abline(intercept = 0, slope = 0, linetype = "dashed") +
+  theme_bw() + theme(panel.grid = element_blank()) + 
+  ylab("Autocorrelation term") +
+  scale_x_continuous(breaks = c(1:12))
+
+# plot groundwater effects
+efftib %>%
+  ggplot() +
+  geom_point(aes(x = month, y = mean.gw)) +
+  geom_errorbar(aes(x = month, ymin = lower.gw, ymax = upper.gw), width = 0.4) +
+  geom_abline(intercept = 0, slope = 0, linetype = "dashed") +
+  theme_bw() + theme(panel.grid = element_blank()) + 
+  ylab("Effect of groundwater on model residuals") +
+  scale_x_continuous(breaks = c(1:12))
+  
+```
+
+
+

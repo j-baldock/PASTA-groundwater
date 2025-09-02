@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Snake model residuals – Groundwater and Stream Temperature</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./exploredata.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2486e1f0a3ee9ee1fc393803a1361cdb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6561bbde787c299e21493071c8edc6ff.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a80106726509dab1d2ad658cd225c2ab.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="application/json" class="js-hypothesis-config">
+{
+  "theme": "clean"
+}
+</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./SnakeModelResid.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Snake model residuals</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Groundwater and Stream Temperature</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exploredata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Explore Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./SnakeModelResid.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Snake model residuals</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data"><span class="header-section-number">3.1</span> Data</a></li>
+  <li><a href="#summarize-error" id="toc-summarize-error" class="nav-link" data-scroll-target="#summarize-error"><span class="header-section-number">3.2</span> Summarize error</a></li>
+  <li><a href="#visualize-residuals" id="toc-visualize-residuals" class="nav-link" data-scroll-target="#visualize-residuals"><span class="header-section-number">3.3</span> Visualize residuals</a>
+  <ul class="collapse">
+  <li><a href="#obs.-and-preds---scatter" id="toc-obs.-and-preds---scatter" class="nav-link" data-scroll-target="#obs.-and-preds---scatter"><span class="header-section-number">3.3.1</span> Obs. and preds - scatter</a></li>
+  <li><a href="#obs.-and-preds---time-series" id="toc-obs.-and-preds---time-series" class="nav-link" data-scroll-target="#obs.-and-preds---time-series"><span class="header-section-number">3.3.2</span> Obs. and preds - time series</a></li>
+  <li><a href="#residuals---time-series" id="toc-residuals---time-series" class="nav-link" data-scroll-target="#residuals---time-series"><span class="header-section-number">3.3.3</span> Residuals - time series</a></li>
+  </ul></li>
+  <li><a href="#model-residuals" id="toc-model-residuals" class="nav-link" data-scroll-target="#model-residuals"><span class="header-section-number">3.4</span> Model residuals</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Snake model residuals</span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Purpose:</strong> Explore the relationship between residuals from K. Gauthier’s daily stream temperature model and independent metrics of groundwater availability. This is somewhat complicated by the fact that Kevin’s model already uses groundwater availability as a covariate, so we really aren’t evaluating how much additional information the groundwater metric adds, but rather the variance that isn’t explained by the existing metric (e.g., driven by spatial/temporal variation in groundwater temperature, lagged groundwater temperature signals, etc.).</p>
+<section id="data" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="data"><span class="header-section-number">3.1</span> Data</h2>
+<p>Load data from Kevin’s temp model:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Stream temperature/model_obs_pred_data.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model_resid =</span> model_pred <span class="sc">-</span> meanT,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.factor</span>(<span class="fu">year</span>(date))) <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, year) <span class="sc">%&gt;%</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model_resid_lag =</span> <span class="fu">lag</span>(model_resid)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 34
+   ...1     X site        reachid  NEAR_X   NEAR_Y date         DOY dayl_rcamean
+  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+1     1     1 bailey_1776     199 517826. 4784463. 2019-05-11   131         14.3
+2     2     2 bailey_1776     199 517826. 4784463. 2019-05-12   132         14.4
+3     3     3 bailey_1776     199 517826. 4784463. 2019-05-13   133         14.4
+4     4     4 bailey_1776     199 517826. 4784463. 2019-05-14   134         14.4
+5     5     5 bailey_1776     199 517826. 4784463. 2019-05-15   135         14.5
+6     6     6 bailey_1776     199 517826. 4784463. 2019-05-16   136         14.5
+# ℹ 25 more variables: h2oAreaKm2 &lt;dbl&gt;, h2oAreaKm2_log &lt;dbl&gt;,
+#   h2oLakePerc &lt;dbl&gt;, forest_buff_perc &lt;dbl&gt;, h2o_slope_mean &lt;dbl&gt;,
+#   h2o_streamslope_mean &lt;dbl&gt;, h2o_elev_mean &lt;dbl&gt;, logger_elev &lt;dbl&gt;,
+#   elev_diff &lt;dbl&gt;, gw_influence &lt;dbl&gt;, prcp_rcamean &lt;dbl&gt;, prcp_3d &lt;dbl&gt;,
+#   swe_rcamean &lt;dbl&gt;, swe_april1 &lt;dbl&gt;, airtemp_rcamean &lt;dbl&gt;,
+#   airtemp_3d &lt;dbl&gt;, airtemp_5d &lt;dbl&gt;, airtemp_change_3d &lt;dbl&gt;,
+#   airtemp_change_5d &lt;dbl&gt;, meanT &lt;dbl&gt;, model_pred &lt;dbl&gt;, …</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(dat<span class="sc">$</span>site))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 78</code></pre>
+</div>
+</div>
+</section>
+<section id="summarize-error" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="summarize-error"><span class="header-section-number">3.2</span> Summarize error</h2>
+<p>“Global” RMSE</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>((dat<span class="sc">$</span>model_resid)<span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.422302</code></pre>
+</div>
+</div>
+<p>“Global” mean absolute error</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">abs</span>(dat<span class="sc">$</span>model_resid))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.087564</code></pre>
+</div>
+</div>
+<p>Plot relationships between model error (RMSE and MAE) and site-specific covariates</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>errorterms <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">gw_influence =</span> <span class="fu">mean</span>(gw_influence),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">h2oAreaKm2_log =</span> <span class="fu">mean</span>(h2oAreaKm2_log),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">forest_buff_perc =</span> <span class="fu">mean</span>(forest_buff_perc),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">h2o_slope_mean =</span> <span class="fu">mean</span>(h2o_slope_mean),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">h2o_elev_mean =</span> <span class="fu">mean</span>(h2o_elev_mean),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">sampsize =</span> <span class="fu">n</span>(),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmse =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((model_resid)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">mae =</span> <span class="fu">mean</span>(<span class="fu">abs</span>(model_resid))) <span class="sc">%&gt;%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># RMSE</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(gw_influence), <span class="at">y =</span> rmse)) <span class="sc">+</span> </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"log(Groundwater influence)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> h2oAreaKm2_log, <span class="at">y =</span> rmse)) <span class="sc">+</span> </span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"log(Catchment area)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> forest_buff_perc, <span class="at">y =</span> rmse)) <span class="sc">+</span> </span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Forest cover (% in buffer)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> h2o_slope_mean, <span class="at">y =</span> rmse)) <span class="sc">+</span> </span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Mean catchment slope"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>p5 <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> h2o_elev_mean, <span class="at">y =</span> rmse)) <span class="sc">+</span> </span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Mean catchment elevation"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>p6 <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(sampsize), <span class="at">y =</span> rmse)) <span class="sc">+</span> </span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"log(Sample size)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean Absolute Error</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>p1b <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(gw_influence), <span class="at">y =</span> mae)) <span class="sc">+</span> </span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"log(Groundwater influence)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"MAE"</span>) <span class="sc">+</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>p2b <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> h2oAreaKm2_log, <span class="at">y =</span> mae)) <span class="sc">+</span> </span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"log(Catchment area)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"MAE"</span>) <span class="sc">+</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>p3b <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> forest_buff_perc, <span class="at">y =</span> mae)) <span class="sc">+</span> </span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Forest cover (% in buffer)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"MAE"</span>) <span class="sc">+</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>p4b <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> h2o_slope_mean, <span class="at">y =</span> mae)) <span class="sc">+</span> </span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Mean catchment slope"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"MAE"</span>) <span class="sc">+</span></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>p5b <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> h2o_elev_mean, <span class="at">y =</span> mae)) <span class="sc">+</span> </span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Mean catchment elevation"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"MAE"</span>) <span class="sc">+</span></span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>p6b <span class="ot">&lt;-</span> errorterms <span class="sc">%&gt;%</span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(sampsize), <span class="at">y =</span> mae)) <span class="sc">+</span> </span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"log(Sample size)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"MAE"</span>) <span class="sc">+</span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="co"># combine plots</span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(p1, p1b, </span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>          p2, p2b, </span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>          p3, p3b,</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>          p4, p4b,</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>          p5, p5b,</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>          p6, p6b, <span class="at">nrow =</span> <span class="dv">6</span>, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>View pairs plots among site-specific covariates (some potential multicollinearity)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggpairs</span>(errorterms <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Simple linear model quantifying the effect of site-specific covariates on model RMSE</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(rmse <span class="sc">~</span> gw_influence <span class="sc">+</span> h2oAreaKm2_log <span class="sc">+</span> forest_buff_perc <span class="sc">+</span> h2o_slope_mean <span class="sc">+</span> h2o_elev_mean <span class="sc">+</span> sampsize, <span class="at">data =</span> errorterms))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = rmse ~ gw_influence + h2oAreaKm2_log + forest_buff_perc + 
+    h2o_slope_mean + h2o_elev_mean + sampsize, data = errorterms)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.65322 -0.24584 -0.06325  0.20642  1.18937 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)       1.052e+00  5.832e-01   1.803   0.0756 .
+gw_influence      1.649e-01  3.020e-01   0.546   0.5867  
+h2oAreaKm2_log   -9.849e-02  3.784e-02  -2.602   0.0113 *
+forest_buff_perc -2.569e-03  2.193e-03  -1.171   0.2453  
+h2o_slope_mean    7.075e-03  9.465e-03   0.748   0.4572  
+h2o_elev_mean     3.271e-04  2.231e-04   1.466   0.1471  
+sampsize         -4.748e-05  6.419e-05  -0.740   0.4619  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.379 on 71 degrees of freedom
+Multiple R-squared:  0.1505,    Adjusted R-squared:  0.07876 
+F-statistic: 2.097 on 6 and 71 DF,  p-value: 0.06417</code></pre>
+</div>
+</div>
+</section>
+<section id="visualize-residuals" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="visualize-residuals"><span class="header-section-number">3.3</span> Visualize residuals</h2>
+<section id="obs.-and-preds---scatter" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="obs.-and-preds---scatter"><span class="header-section-number">3.3.1</span> Obs. and preds - scatter</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> meanT, <span class="at">y =</span> model_pred)) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Observed temperature"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Predicted temperature"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> meanT, <span class="at">y =</span> model_pred)) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> year), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Observed temperature"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Predicted temperature"</span>) <span class="sc">+</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">n_pages</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">p1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">p2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">p3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">p4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">p5</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false">p6</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-7" role="tab" aria-controls="tabset-1-7" aria-selected="false">p7</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-7-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="obs.-and-preds---time-series" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="obs.-and-preds---time-series"><span class="header-section-number">3.3.2</span> Obs. and preds - time series</h3>
+<p>View time series with observations (<strong>black text</strong>) and model predictions (<span style="color: red;"><strong>red text</strong></span>)</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> meanT)) <span class="sc">+</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> model_pred), <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">n_pages</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">p1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">p2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">p3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">p4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">p5</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false">p6</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false">p7</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">1</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">2</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">3</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">4</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">5</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">6</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-7-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">7</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="residuals---time-series" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="residuals---time-series"><span class="header-section-number">3.3.3</span> Residuals - time series</h3>
+<p>View all time series of residuals together</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> DOY, <span class="at">y =</span> model_resid)) <span class="sc">+</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Facet by site, color by year:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> DOY, <span class="at">y =</span> model_resid, <span class="at">color =</span> year)) <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">n_pages</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">p1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">p2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">p3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">p4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false">p5</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-6" role="tab" aria-controls="tabset-3-6" aria-selected="false">p6</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-7" role="tab" aria-controls="tabset-3-7" aria-selected="false">p7</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-7-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span> site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">page =</span> <span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Annual pattern of residuals is generally consistent among years, within sites. Strong autocorrelation</p>
+</section>
+</section>
+<section id="model-residuals" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="model-residuals"><span class="header-section-number">3.4</span> Model residuals</h2>
+<p>Absolute residuals by groundwater input</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(<span class="fu">abs</span>(model_resid) <span class="sc">~</span> <span class="fu">abs</span>(model_resid_lag) <span class="sc">+</span> gw_influence, <span class="at">data =</span> dat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = abs(model_resid) ~ abs(model_resid_lag) + gw_influence, 
+    data = dat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.2751 -0.2558 -0.0380  0.2549  4.5355 
+
+Coefficients:
+                     Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)          0.148783   0.003373   44.11   &lt;2e-16 ***
+abs(model_resid_lag) 0.838719   0.002045  410.17   &lt;2e-16 ***
+gw_influence         0.106627   0.008510   12.53   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4909 on 70337 degrees of freedom
+  (284 observations deleted due to missingness)
+Multiple R-squared:  0.7122,    Adjusted R-squared:  0.7122 
+F-statistic: 8.703e+04 on 2 and 70337 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gw_influence, <span class="at">y =</span> <span class="fu">abs</span>(model_resid))) <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Residuals by groundwater and month</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gw_influence, <span class="at">y =</span> model_resid)) <span class="sc">+</span> </span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>tim.month) <span class="sc">+</span> </span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Explore time varying effects of groundwater on model residuals (linear mixed effects model includes lagged/autocorrelation term and random intercepts for year).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit mixed effects models in a loop, independently for each month: residuals as a function of lagged residuals, site-level groundwater influence, and random intercepts for year</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>modlist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>) {</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  modlist[[i]] <span class="ot">&lt;-</span> <span class="fu">lmer</span>(model_resid <span class="sc">~</span> model_resid_lag <span class="sc">+</span> gw_influence <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>year), <span class="at">data =</span> dat <span class="sc">%&gt;%</span> <span class="fu">filter</span>(tim.month <span class="sc">==</span> i))</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co"># empty tibble to store coefficients</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>efftib <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">month =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, </span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mean.gw =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lower.gw =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">upper.gw =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>), </span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>                 </span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mean.ac =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lower.ac =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">upper.ac =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>))</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="co"># get coefficients, means and 95% confidence intervals</span></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>) {</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>mean.gw[i] <span class="ot">&lt;-</span> <span class="fu">fixef</span>(modlist[[i]])[<span class="dv">3</span>]</span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>lower.gw[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">5</span>,<span class="dv">1</span>]</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>upper.gw[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">5</span>,<span class="dv">2</span>]</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>mean.ac[i] <span class="ot">&lt;-</span> <span class="fu">fixef</span>(modlist[[i]])[<span class="dv">2</span>]</span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>lower.ac[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">4</span>,<span class="dv">1</span>]</span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>upper.ac[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">4</span>,<span class="dv">2</span>]</span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a><span class="co"># plot autocorrelation terms</span></span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>efftib <span class="sc">%&gt;%</span></span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> mean.ac)) <span class="sc">+</span></span>
+<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">ymin =</span> lower.ac, <span class="at">ymax =</span> upper.ac), <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> </span>
+<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Autocorrelation term"</span>) <span class="sc">+</span></span>
+<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot groundwater effects</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>efftib <span class="sc">%&gt;%</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> mean.gw)) <span class="sc">+</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">ymin =</span> lower.gw, <span class="at">ymax =</span> upper.gw), <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> </span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Effect of groundwater on model residuals"</span>) <span class="sc">+</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SnakeModelResid_files/figure-html/unnamed-chunk-36-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./exploredata.html" class="pagination-link" aria-label="Explore Data">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Explore Data</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb48" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Snake model residuals"</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>**Purpose:** Explore the relationship between residuals from K. Gauthier's daily stream temperature model and independent metrics of groundwater availability. This is somewhat complicated by the fact that Kevin's model already uses groundwater availability as a covariate, so we really aren't evaluating how much additional information the groundwater metric adds, but rather the variance that isn't explained by the existing metric (e.g., driven by spatial/temporal variation in groundwater temperature, lagged groundwater temperature signals, etc.).</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="in">```{r include=FALSE}</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggforce)</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="in">library(lme4)</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a><span class="in">library(egg)</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a><span class="in">library(GGally)</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>Load data from Kevin's temp model: </span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Stream temperature/model_obs_pred_data.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model_resid =</span> model_pred <span class="sc">-</span> meanT,</span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">as.factor</span>(<span class="fu">year</span>(date))) <span class="sc">%&gt;%</span></span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, year) <span class="sc">%&gt;%</span></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model_resid_lag =</span> <span class="fu">lag</span>(model_resid)) <span class="sc">%&gt;%</span></span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dat)</span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(dat<span class="sc">$</span>site))</span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summarize error</span></span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>"Global" RMSE</span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>((dat<span class="sc">$</span>model_resid)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a>"Global" mean absolute error</span>
+<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">abs</span>(dat<span class="sc">$</span>model_resid))</span>
+<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-51"><a href="#cb48-51" aria-hidden="true" tabindex="-1"></a>Plot relationships between model error (RMSE and MAE) and site-specific covariates</span>
+<span id="cb48-52"><a href="#cb48-52" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=6, fig.height=12}</span></span>
+<span id="cb48-53"><a href="#cb48-53" aria-hidden="true" tabindex="-1"></a><span class="in">errorterms &lt;- dat %&gt;%</span></span>
+<span id="cb48-54"><a href="#cb48-54" aria-hidden="true" tabindex="-1"></a><span class="in">  group_by(site) %&gt;%</span></span>
+<span id="cb48-55"><a href="#cb48-55" aria-hidden="true" tabindex="-1"></a><span class="in">  summarize(gw_influence = mean(gw_influence),</span></span>
+<span id="cb48-56"><a href="#cb48-56" aria-hidden="true" tabindex="-1"></a><span class="in">            h2oAreaKm2_log = mean(h2oAreaKm2_log),</span></span>
+<span id="cb48-57"><a href="#cb48-57" aria-hidden="true" tabindex="-1"></a><span class="in">            forest_buff_perc = mean(forest_buff_perc),</span></span>
+<span id="cb48-58"><a href="#cb48-58" aria-hidden="true" tabindex="-1"></a><span class="in">            h2o_slope_mean = mean(h2o_slope_mean),</span></span>
+<span id="cb48-59"><a href="#cb48-59" aria-hidden="true" tabindex="-1"></a><span class="in">            h2o_elev_mean = mean(h2o_elev_mean),</span></span>
+<span id="cb48-60"><a href="#cb48-60" aria-hidden="true" tabindex="-1"></a><span class="in">            sampsize = n(),</span></span>
+<span id="cb48-61"><a href="#cb48-61" aria-hidden="true" tabindex="-1"></a><span class="in">            rmse = sqrt(mean((model_resid)^2)),</span></span>
+<span id="cb48-62"><a href="#cb48-62" aria-hidden="true" tabindex="-1"></a><span class="in">            mae = mean(abs(model_resid))) %&gt;%</span></span>
+<span id="cb48-63"><a href="#cb48-63" aria-hidden="true" tabindex="-1"></a><span class="in">  ungroup()</span></span>
+<span id="cb48-64"><a href="#cb48-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-65"><a href="#cb48-65" aria-hidden="true" tabindex="-1"></a><span class="in"># RMSE</span></span>
+<span id="cb48-66"><a href="#cb48-66" aria-hidden="true" tabindex="-1"></a><span class="in">p1 &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-67"><a href="#cb48-67" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = log(gw_influence), y = rmse)) + </span></span>
+<span id="cb48-68"><a href="#cb48-68" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-69"><a href="#cb48-69" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-70"><a href="#cb48-70" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("log(Groundwater influence)") + ylab("RMSE") +</span></span>
+<span id="cb48-71"><a href="#cb48-71" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-72"><a href="#cb48-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-73"><a href="#cb48-73" aria-hidden="true" tabindex="-1"></a><span class="in">p2 &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-74"><a href="#cb48-74" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = h2oAreaKm2_log, y = rmse)) + </span></span>
+<span id="cb48-75"><a href="#cb48-75" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-76"><a href="#cb48-76" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-77"><a href="#cb48-77" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("log(Catchment area)") + ylab("RMSE") +</span></span>
+<span id="cb48-78"><a href="#cb48-78" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-79"><a href="#cb48-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-80"><a href="#cb48-80" aria-hidden="true" tabindex="-1"></a><span class="in">p3 &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-81"><a href="#cb48-81" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = forest_buff_perc, y = rmse)) + </span></span>
+<span id="cb48-82"><a href="#cb48-82" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-83"><a href="#cb48-83" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-84"><a href="#cb48-84" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Forest cover (% in buffer)") + ylab("RMSE") +</span></span>
+<span id="cb48-85"><a href="#cb48-85" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-86"><a href="#cb48-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-87"><a href="#cb48-87" aria-hidden="true" tabindex="-1"></a><span class="in">p4 &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-88"><a href="#cb48-88" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = h2o_slope_mean, y = rmse)) + </span></span>
+<span id="cb48-89"><a href="#cb48-89" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-90"><a href="#cb48-90" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-91"><a href="#cb48-91" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Mean catchment slope") + ylab("RMSE") +</span></span>
+<span id="cb48-92"><a href="#cb48-92" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-93"><a href="#cb48-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-94"><a href="#cb48-94" aria-hidden="true" tabindex="-1"></a><span class="in">p5 &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-95"><a href="#cb48-95" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = h2o_elev_mean, y = rmse)) + </span></span>
+<span id="cb48-96"><a href="#cb48-96" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-97"><a href="#cb48-97" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-98"><a href="#cb48-98" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Mean catchment elevation") + ylab("RMSE") +</span></span>
+<span id="cb48-99"><a href="#cb48-99" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-100"><a href="#cb48-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-101"><a href="#cb48-101" aria-hidden="true" tabindex="-1"></a><span class="in">p6 &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-102"><a href="#cb48-102" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = log(sampsize), y = rmse)) + </span></span>
+<span id="cb48-103"><a href="#cb48-103" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-104"><a href="#cb48-104" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-105"><a href="#cb48-105" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("log(Sample size)") + ylab("RMSE") +</span></span>
+<span id="cb48-106"><a href="#cb48-106" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-107"><a href="#cb48-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-108"><a href="#cb48-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-109"><a href="#cb48-109" aria-hidden="true" tabindex="-1"></a><span class="in"># Mean Absolute Error</span></span>
+<span id="cb48-110"><a href="#cb48-110" aria-hidden="true" tabindex="-1"></a><span class="in">p1b &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-111"><a href="#cb48-111" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = log(gw_influence), y = mae)) + </span></span>
+<span id="cb48-112"><a href="#cb48-112" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-113"><a href="#cb48-113" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-114"><a href="#cb48-114" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("log(Groundwater influence)") + ylab("MAE") +</span></span>
+<span id="cb48-115"><a href="#cb48-115" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-116"><a href="#cb48-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-117"><a href="#cb48-117" aria-hidden="true" tabindex="-1"></a><span class="in">p2b &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-118"><a href="#cb48-118" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = h2oAreaKm2_log, y = mae)) + </span></span>
+<span id="cb48-119"><a href="#cb48-119" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-120"><a href="#cb48-120" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-121"><a href="#cb48-121" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("log(Catchment area)") + ylab("MAE") +</span></span>
+<span id="cb48-122"><a href="#cb48-122" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-123"><a href="#cb48-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-124"><a href="#cb48-124" aria-hidden="true" tabindex="-1"></a><span class="in">p3b &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-125"><a href="#cb48-125" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = forest_buff_perc, y = mae)) + </span></span>
+<span id="cb48-126"><a href="#cb48-126" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-127"><a href="#cb48-127" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-128"><a href="#cb48-128" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Forest cover (% in buffer)") + ylab("MAE") +</span></span>
+<span id="cb48-129"><a href="#cb48-129" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-130"><a href="#cb48-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-131"><a href="#cb48-131" aria-hidden="true" tabindex="-1"></a><span class="in">p4b &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-132"><a href="#cb48-132" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = h2o_slope_mean, y = mae)) + </span></span>
+<span id="cb48-133"><a href="#cb48-133" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-134"><a href="#cb48-134" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-135"><a href="#cb48-135" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Mean catchment slope") + ylab("MAE") +</span></span>
+<span id="cb48-136"><a href="#cb48-136" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-137"><a href="#cb48-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-138"><a href="#cb48-138" aria-hidden="true" tabindex="-1"></a><span class="in">p5b &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-139"><a href="#cb48-139" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = h2o_elev_mean, y = mae)) + </span></span>
+<span id="cb48-140"><a href="#cb48-140" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-141"><a href="#cb48-141" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-142"><a href="#cb48-142" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("Mean catchment elevation") + ylab("MAE") +</span></span>
+<span id="cb48-143"><a href="#cb48-143" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-144"><a href="#cb48-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-145"><a href="#cb48-145" aria-hidden="true" tabindex="-1"></a><span class="in">p6b &lt;- errorterms %&gt;%</span></span>
+<span id="cb48-146"><a href="#cb48-146" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = log(sampsize), y = mae)) + </span></span>
+<span id="cb48-147"><a href="#cb48-147" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-148"><a href="#cb48-148" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-149"><a href="#cb48-149" aria-hidden="true" tabindex="-1"></a><span class="in">  xlab("log(Sample size)") + ylab("MAE") +</span></span>
+<span id="cb48-150"><a href="#cb48-150" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw() + theme(panel.grid = element_blank())</span></span>
+<span id="cb48-151"><a href="#cb48-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-152"><a href="#cb48-152" aria-hidden="true" tabindex="-1"></a><span class="in"># combine plots</span></span>
+<span id="cb48-153"><a href="#cb48-153" aria-hidden="true" tabindex="-1"></a><span class="in">ggarrange(p1, p1b, </span></span>
+<span id="cb48-154"><a href="#cb48-154" aria-hidden="true" tabindex="-1"></a><span class="in">          p2, p2b, </span></span>
+<span id="cb48-155"><a href="#cb48-155" aria-hidden="true" tabindex="-1"></a><span class="in">          p3, p3b,</span></span>
+<span id="cb48-156"><a href="#cb48-156" aria-hidden="true" tabindex="-1"></a><span class="in">          p4, p4b,</span></span>
+<span id="cb48-157"><a href="#cb48-157" aria-hidden="true" tabindex="-1"></a><span class="in">          p5, p5b,</span></span>
+<span id="cb48-158"><a href="#cb48-158" aria-hidden="true" tabindex="-1"></a><span class="in">          p6, p6b, nrow = 6, ncol = 2, byrow = TRUE)</span></span>
+<span id="cb48-159"><a href="#cb48-159" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb48-160"><a href="#cb48-160" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-161"><a href="#cb48-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-162"><a href="#cb48-162" aria-hidden="true" tabindex="-1"></a>View pairs plots among site-specific covariates (some potential multicollinearity)</span>
+<span id="cb48-163"><a href="#cb48-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=7, fig.height=7}</span></span>
+<span id="cb48-164"><a href="#cb48-164" aria-hidden="true" tabindex="-1"></a><span class="in">ggpairs(errorterms %&gt;% select(2:7))</span></span>
+<span id="cb48-165"><a href="#cb48-165" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-166"><a href="#cb48-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-167"><a href="#cb48-167" aria-hidden="true" tabindex="-1"></a>Simple linear model quantifying the effect of site-specific covariates on model RMSE</span>
+<span id="cb48-170"><a href="#cb48-170" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-171"><a href="#cb48-171" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(rmse <span class="sc">~</span> gw_influence <span class="sc">+</span> h2oAreaKm2_log <span class="sc">+</span> forest_buff_perc <span class="sc">+</span> h2o_slope_mean <span class="sc">+</span> h2o_elev_mean <span class="sc">+</span> sampsize, <span class="at">data =</span> errorterms))</span>
+<span id="cb48-172"><a href="#cb48-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-173"><a href="#cb48-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-174"><a href="#cb48-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-175"><a href="#cb48-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visualize residuals</span></span>
+<span id="cb48-176"><a href="#cb48-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-177"><a href="#cb48-177" aria-hidden="true" tabindex="-1"></a><span class="fu">### Obs. and preds - scatter</span></span>
+<span id="cb48-178"><a href="#cb48-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-181"><a href="#cb48-181" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-182"><a href="#cb48-182" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb48-183"><a href="#cb48-183" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> meanT, <span class="at">y =</span> model_pred)) <span class="sc">+</span></span>
+<span id="cb48-184"><a href="#cb48-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb48-185"><a href="#cb48-185" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb48-186"><a href="#cb48-186" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb48-187"><a href="#cb48-187" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Observed temperature"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Predicted temperature"</span>)</span>
+<span id="cb48-188"><a href="#cb48-188" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-189"><a href="#cb48-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-192"><a href="#cb48-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-193"><a href="#cb48-193" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb48-194"><a href="#cb48-194" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> meanT, <span class="at">y =</span> model_pred)) <span class="sc">+</span></span>
+<span id="cb48-195"><a href="#cb48-195" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> year), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb48-196"><a href="#cb48-196" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb48-197"><a href="#cb48-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb48-198"><a href="#cb48-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Observed temperature"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Predicted temperature"</span>) <span class="sc">+</span></span>
+<span id="cb48-199"><a href="#cb48-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span>
+<span id="cb48-200"><a href="#cb48-200" aria-hidden="true" tabindex="-1"></a><span class="fu">n_pages</span>(p)</span>
+<span id="cb48-201"><a href="#cb48-201" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-202"><a href="#cb48-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-203"><a href="#cb48-203" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb48-204"><a href="#cb48-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-205"><a href="#cb48-205" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p1</span></span>
+<span id="cb48-206"><a href="#cb48-206" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-207"><a href="#cb48-207" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 1)</span></span>
+<span id="cb48-208"><a href="#cb48-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-209"><a href="#cb48-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-210"><a href="#cb48-210" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p2</span></span>
+<span id="cb48-211"><a href="#cb48-211" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-212"><a href="#cb48-212" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 2)</span></span>
+<span id="cb48-213"><a href="#cb48-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-214"><a href="#cb48-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-215"><a href="#cb48-215" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p3</span></span>
+<span id="cb48-216"><a href="#cb48-216" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-217"><a href="#cb48-217" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 3)</span></span>
+<span id="cb48-218"><a href="#cb48-218" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-219"><a href="#cb48-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-220"><a href="#cb48-220" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p4</span></span>
+<span id="cb48-221"><a href="#cb48-221" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-222"><a href="#cb48-222" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 4)</span></span>
+<span id="cb48-223"><a href="#cb48-223" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-224"><a href="#cb48-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-225"><a href="#cb48-225" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p5</span></span>
+<span id="cb48-226"><a href="#cb48-226" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-227"><a href="#cb48-227" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 5)</span></span>
+<span id="cb48-228"><a href="#cb48-228" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-229"><a href="#cb48-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-230"><a href="#cb48-230" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p6</span></span>
+<span id="cb48-231"><a href="#cb48-231" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-232"><a href="#cb48-232" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 6)</span></span>
+<span id="cb48-233"><a href="#cb48-233" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-234"><a href="#cb48-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-235"><a href="#cb48-235" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p7</span></span>
+<span id="cb48-236"><a href="#cb48-236" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-237"><a href="#cb48-237" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 7)</span></span>
+<span id="cb48-238"><a href="#cb48-238" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-239"><a href="#cb48-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-240"><a href="#cb48-240" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb48-241"><a href="#cb48-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-242"><a href="#cb48-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-243"><a href="#cb48-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-244"><a href="#cb48-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-245"><a href="#cb48-245" aria-hidden="true" tabindex="-1"></a><span class="fu">### Obs. and preds - time series</span></span>
+<span id="cb48-246"><a href="#cb48-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-247"><a href="#cb48-247" aria-hidden="true" tabindex="-1"></a>View time series with observations (**black text**) and model predictions ([**red text**]{style="color: red;"})</span>
+<span id="cb48-250"><a href="#cb48-250" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-251"><a href="#cb48-251" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<span id="cb48-252"><a href="#cb48-252" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb48-253"><a href="#cb48-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> meanT)) <span class="sc">+</span> </span>
+<span id="cb48-254"><a href="#cb48-254" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> model_pred), <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb48-255"><a href="#cb48-255" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb48-256"><a href="#cb48-256" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">scales =</span> <span class="st">"free_x"</span>)</span>
+<span id="cb48-257"><a href="#cb48-257" aria-hidden="true" tabindex="-1"></a><span class="fu">n_pages</span>(p)</span>
+<span id="cb48-258"><a href="#cb48-258" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-259"><a href="#cb48-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-260"><a href="#cb48-260" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb48-261"><a href="#cb48-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-262"><a href="#cb48-262" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p1</span></span>
+<span id="cb48-263"><a href="#cb48-263" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-264"><a href="#cb48-264" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 1, scales = "free_x")</span></span>
+<span id="cb48-265"><a href="#cb48-265" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-266"><a href="#cb48-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-267"><a href="#cb48-267" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p2</span></span>
+<span id="cb48-268"><a href="#cb48-268" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-269"><a href="#cb48-269" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 2, scales = "free_x")</span></span>
+<span id="cb48-270"><a href="#cb48-270" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-271"><a href="#cb48-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-272"><a href="#cb48-272" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p3</span></span>
+<span id="cb48-273"><a href="#cb48-273" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-274"><a href="#cb48-274" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 3, scales = "free_x")</span></span>
+<span id="cb48-275"><a href="#cb48-275" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-276"><a href="#cb48-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-277"><a href="#cb48-277" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p4</span></span>
+<span id="cb48-278"><a href="#cb48-278" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-279"><a href="#cb48-279" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 4, scales = "free_x")</span></span>
+<span id="cb48-280"><a href="#cb48-280" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-281"><a href="#cb48-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-282"><a href="#cb48-282" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p5</span></span>
+<span id="cb48-283"><a href="#cb48-283" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-284"><a href="#cb48-284" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 5, scales = "free_x")</span></span>
+<span id="cb48-285"><a href="#cb48-285" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-286"><a href="#cb48-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-287"><a href="#cb48-287" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p6</span></span>
+<span id="cb48-288"><a href="#cb48-288" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-289"><a href="#cb48-289" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 6, scales = "free_x")</span></span>
+<span id="cb48-290"><a href="#cb48-290" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-291"><a href="#cb48-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-292"><a href="#cb48-292" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p7</span></span>
+<span id="cb48-293"><a href="#cb48-293" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-294"><a href="#cb48-294" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 7, scales = "free_x")</span></span>
+<span id="cb48-295"><a href="#cb48-295" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-296"><a href="#cb48-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-297"><a href="#cb48-297" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb48-298"><a href="#cb48-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-299"><a href="#cb48-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-300"><a href="#cb48-300" aria-hidden="true" tabindex="-1"></a><span class="fu">### Residuals - time series</span></span>
+<span id="cb48-301"><a href="#cb48-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-302"><a href="#cb48-302" aria-hidden="true" tabindex="-1"></a>View all time series of residuals together</span>
+<span id="cb48-305"><a href="#cb48-305" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-306"><a href="#cb48-306" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb48-307"><a href="#cb48-307" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> DOY, <span class="at">y =</span> model_resid)) <span class="sc">+</span> </span>
+<span id="cb48-308"><a href="#cb48-308" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb48-309"><a href="#cb48-309" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-310"><a href="#cb48-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-311"><a href="#cb48-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-312"><a href="#cb48-312" aria-hidden="true" tabindex="-1"></a>Facet by site, color by year:</span>
+<span id="cb48-315"><a href="#cb48-315" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-316"><a href="#cb48-316" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<span id="cb48-317"><a href="#cb48-317" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb48-318"><a href="#cb48-318" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> DOY, <span class="at">y =</span> model_resid, <span class="at">color =</span> year)) <span class="sc">+</span></span>
+<span id="cb48-319"><a href="#cb48-319" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb48-320"><a href="#cb48-320" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb48-321"><a href="#cb48-321" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap_paginate</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">4</span>)</span>
+<span id="cb48-322"><a href="#cb48-322" aria-hidden="true" tabindex="-1"></a><span class="fu">n_pages</span>(p)</span>
+<span id="cb48-323"><a href="#cb48-323" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-324"><a href="#cb48-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-325"><a href="#cb48-325" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb48-326"><a href="#cb48-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-327"><a href="#cb48-327" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p1</span></span>
+<span id="cb48-328"><a href="#cb48-328" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-329"><a href="#cb48-329" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 1)</span></span>
+<span id="cb48-330"><a href="#cb48-330" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-331"><a href="#cb48-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-332"><a href="#cb48-332" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p2</span></span>
+<span id="cb48-333"><a href="#cb48-333" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-334"><a href="#cb48-334" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 2)</span></span>
+<span id="cb48-335"><a href="#cb48-335" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-336"><a href="#cb48-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-337"><a href="#cb48-337" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p3</span></span>
+<span id="cb48-338"><a href="#cb48-338" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-339"><a href="#cb48-339" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 3)</span></span>
+<span id="cb48-340"><a href="#cb48-340" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-341"><a href="#cb48-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-342"><a href="#cb48-342" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p4</span></span>
+<span id="cb48-343"><a href="#cb48-343" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-344"><a href="#cb48-344" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 4)</span></span>
+<span id="cb48-345"><a href="#cb48-345" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-346"><a href="#cb48-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-347"><a href="#cb48-347" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p5</span></span>
+<span id="cb48-348"><a href="#cb48-348" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-349"><a href="#cb48-349" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 5)</span></span>
+<span id="cb48-350"><a href="#cb48-350" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-351"><a href="#cb48-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-352"><a href="#cb48-352" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p6</span></span>
+<span id="cb48-353"><a href="#cb48-353" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-354"><a href="#cb48-354" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 6)</span></span>
+<span id="cb48-355"><a href="#cb48-355" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-356"><a href="#cb48-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-357"><a href="#cb48-357" aria-hidden="true" tabindex="-1"></a><span class="fu">#### p7</span></span>
+<span id="cb48-358"><a href="#cb48-358" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=8, fig.height=10}</span></span>
+<span id="cb48-359"><a href="#cb48-359" aria-hidden="true" tabindex="-1"></a><span class="in">p + facet_wrap_paginate(~ site, ncol = 3, nrow = 4, page = 7)</span></span>
+<span id="cb48-360"><a href="#cb48-360" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-361"><a href="#cb48-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-362"><a href="#cb48-362" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb48-363"><a href="#cb48-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-364"><a href="#cb48-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-365"><a href="#cb48-365" aria-hidden="true" tabindex="-1"></a>Annual pattern of residuals is generally consistent among years, within sites. Strong autocorrelation</span>
+<span id="cb48-366"><a href="#cb48-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-367"><a href="#cb48-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-368"><a href="#cb48-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-369"><a href="#cb48-369" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model residuals</span></span>
+<span id="cb48-370"><a href="#cb48-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-371"><a href="#cb48-371" aria-hidden="true" tabindex="-1"></a>Absolute residuals by groundwater input</span>
+<span id="cb48-374"><a href="#cb48-374" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-375"><a href="#cb48-375" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(<span class="fu">abs</span>(model_resid) <span class="sc">~</span> <span class="fu">abs</span>(model_resid_lag) <span class="sc">+</span> gw_influence, <span class="at">data =</span> dat))</span>
+<span id="cb48-376"><a href="#cb48-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-377"><a href="#cb48-377" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span></span>
+<span id="cb48-378"><a href="#cb48-378" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gw_influence, <span class="at">y =</span> <span class="fu">abs</span>(model_resid))) <span class="sc">+</span></span>
+<span id="cb48-379"><a href="#cb48-379" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb48-380"><a href="#cb48-380" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb48-381"><a href="#cb48-381" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span>
+<span id="cb48-382"><a href="#cb48-382" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-383"><a href="#cb48-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-384"><a href="#cb48-384" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-385"><a href="#cb48-385" aria-hidden="true" tabindex="-1"></a>Residuals by groundwater and month</span>
+<span id="cb48-386"><a href="#cb48-386" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fig.width=7, fig.height=7}</span></span>
+<span id="cb48-387"><a href="#cb48-387" aria-hidden="true" tabindex="-1"></a><span class="in">dat %&gt;%</span></span>
+<span id="cb48-388"><a href="#cb48-388" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(x = gw_influence, y = model_resid)) + </span></span>
+<span id="cb48-389"><a href="#cb48-389" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point() +</span></span>
+<span id="cb48-390"><a href="#cb48-390" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth(method = "lm") +</span></span>
+<span id="cb48-391"><a href="#cb48-391" aria-hidden="true" tabindex="-1"></a><span class="in">  facet_wrap(~tim.month) + </span></span>
+<span id="cb48-392"><a href="#cb48-392" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_bw()</span></span>
+<span id="cb48-393"><a href="#cb48-393" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-394"><a href="#cb48-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-395"><a href="#cb48-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-396"><a href="#cb48-396" aria-hidden="true" tabindex="-1"></a>Explore time varying effects of groundwater on model residuals (linear mixed effects model includes lagged/autocorrelation term and random intercepts for year).</span>
+<span id="cb48-399"><a href="#cb48-399" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb48-400"><a href="#cb48-400" aria-hidden="true" tabindex="-1"></a><span class="co"># fit mixed effects models in a loop, independently for each month: residuals as a function of lagged residuals, site-level groundwater influence, and random intercepts for year</span></span>
+<span id="cb48-401"><a href="#cb48-401" aria-hidden="true" tabindex="-1"></a>modlist <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb48-402"><a href="#cb48-402" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>) {</span>
+<span id="cb48-403"><a href="#cb48-403" aria-hidden="true" tabindex="-1"></a>  modlist[[i]] <span class="ot">&lt;-</span> <span class="fu">lmer</span>(model_resid <span class="sc">~</span> model_resid_lag <span class="sc">+</span> gw_influence <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>year), <span class="at">data =</span> dat <span class="sc">%&gt;%</span> <span class="fu">filter</span>(tim.month <span class="sc">==</span> i))</span>
+<span id="cb48-404"><a href="#cb48-404" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-405"><a href="#cb48-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-406"><a href="#cb48-406" aria-hidden="true" tabindex="-1"></a><span class="co"># empty tibble to store coefficients</span></span>
+<span id="cb48-407"><a href="#cb48-407" aria-hidden="true" tabindex="-1"></a>efftib <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">month =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, </span>
+<span id="cb48-408"><a href="#cb48-408" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mean.gw =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb48-409"><a href="#cb48-409" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lower.gw =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb48-410"><a href="#cb48-410" aria-hidden="true" tabindex="-1"></a>                 <span class="at">upper.gw =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>), </span>
+<span id="cb48-411"><a href="#cb48-411" aria-hidden="true" tabindex="-1"></a>                 </span>
+<span id="cb48-412"><a href="#cb48-412" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mean.ac =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb48-413"><a href="#cb48-413" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lower.ac =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>),</span>
+<span id="cb48-414"><a href="#cb48-414" aria-hidden="true" tabindex="-1"></a>                 <span class="at">upper.ac =</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">12</span>))</span>
+<span id="cb48-415"><a href="#cb48-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-416"><a href="#cb48-416" aria-hidden="true" tabindex="-1"></a><span class="co"># get coefficients, means and 95% confidence intervals</span></span>
+<span id="cb48-417"><a href="#cb48-417" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>) {</span>
+<span id="cb48-418"><a href="#cb48-418" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>mean.gw[i] <span class="ot">&lt;-</span> <span class="fu">fixef</span>(modlist[[i]])[<span class="dv">3</span>]</span>
+<span id="cb48-419"><a href="#cb48-419" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>lower.gw[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">5</span>,<span class="dv">1</span>]</span>
+<span id="cb48-420"><a href="#cb48-420" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>upper.gw[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">5</span>,<span class="dv">2</span>]</span>
+<span id="cb48-421"><a href="#cb48-421" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb48-422"><a href="#cb48-422" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>mean.ac[i] <span class="ot">&lt;-</span> <span class="fu">fixef</span>(modlist[[i]])[<span class="dv">2</span>]</span>
+<span id="cb48-423"><a href="#cb48-423" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>lower.ac[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">4</span>,<span class="dv">1</span>]</span>
+<span id="cb48-424"><a href="#cb48-424" aria-hidden="true" tabindex="-1"></a>  efftib<span class="sc">$</span>upper.ac[i] <span class="ot">&lt;-</span> <span class="fu">confint</span>(modlist[[i]])[<span class="dv">4</span>,<span class="dv">2</span>]</span>
+<span id="cb48-425"><a href="#cb48-425" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-426"><a href="#cb48-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-427"><a href="#cb48-427" aria-hidden="true" tabindex="-1"></a><span class="co"># plot autocorrelation terms</span></span>
+<span id="cb48-428"><a href="#cb48-428" aria-hidden="true" tabindex="-1"></a>efftib <span class="sc">%&gt;%</span></span>
+<span id="cb48-429"><a href="#cb48-429" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb48-430"><a href="#cb48-430" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> mean.ac)) <span class="sc">+</span></span>
+<span id="cb48-431"><a href="#cb48-431" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">ymin =</span> lower.ac, <span class="at">ymax =</span> upper.ac), <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb48-432"><a href="#cb48-432" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb48-433"><a href="#cb48-433" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> </span>
+<span id="cb48-434"><a href="#cb48-434" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Autocorrelation term"</span>) <span class="sc">+</span></span>
+<span id="cb48-435"><a href="#cb48-435" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>))</span>
+<span id="cb48-436"><a href="#cb48-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-437"><a href="#cb48-437" aria-hidden="true" tabindex="-1"></a><span class="co"># plot groundwater effects</span></span>
+<span id="cb48-438"><a href="#cb48-438" aria-hidden="true" tabindex="-1"></a>efftib <span class="sc">%&gt;%</span></span>
+<span id="cb48-439"><a href="#cb48-439" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb48-440"><a href="#cb48-440" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> mean.gw)) <span class="sc">+</span></span>
+<span id="cb48-441"><a href="#cb48-441" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">ymin =</span> lower.gw, <span class="at">ymax =</span> upper.gw), <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb48-442"><a href="#cb48-442" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb48-443"><a href="#cb48-443" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> </span>
+<span id="cb48-444"><a href="#cb48-444" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Effect of groundwater on model residuals"</span>) <span class="sc">+</span></span>
+<span id="cb48-445"><a href="#cb48-445" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>))</span>
+<span id="cb48-446"><a href="#cb48-446" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb48-447"><a href="#cb48-447" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb48-448"><a href="#cb48-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-449"><a href="#cb48-449" aria-hidden="true" tabindex="-1"></a></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
