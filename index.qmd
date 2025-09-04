@@ -1,6 +1,5 @@
 # Introduction
 
-*a test!*
 
 This book provides a visual story of... 
 
