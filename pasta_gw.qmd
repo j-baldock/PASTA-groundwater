@@ -10,6 +10,7 @@ library(dataRetrieval)
 library(fasstr)
 library(GGally)
 library(dygraphs)
+library(ggforce)
 ```
 
 
@@ -74,6 +75,85 @@ egg::ggarrange(dat_pasta %>% ggplot() + geom_histogram(aes(R2_water)),
                dat_pasta %>% ggplot() + geom_histogram(aes(R2_air)))
 ```
 
+Load flagged phase_lag from Tim L.
+```{r}
+phaselag_flags <- read_csv("WY-GW_flag_phase-lag.csv") %>% 
+  rename("UpdatedName" = "site")
+phaselag_flags
+```
+
+Plot time series of monthly flags
+```{r fig.width=7, fig.height=14}
+phaselag_flags %>%
+  ggplot(aes(x = month_date, y = UpdatedName)) + 
+  geom_point(aes(color = as.factor(phase_lag_flag))) + 
+  scale_color_manual(values = c("0" = "grey", "1" = "orange", "2" = "red")) +
+  theme_bw() + theme(legend.position = "top")
+```
+
+Get tibble of "good" sites/months...still >1000 site-months with "good" phase lag estimates. Yay!
+```{r}
+noflag <- phaselag_flags %>% filter(phase_lag_flag == 0) %>% select(UpdatedName, year, month, phase_lag_flag)
+noflag
+```
+
+
+Trim raw PASTA output by phase_lag flags
+```{r}
+dat_pasta_trimmed <- dat_pasta %>% left_join(noflag) %>% filter(phase_lag_flag == 0)
+```
+
+
+#### Inspect PASTA
+
+Set focal stream: Leidy Creek
+```{r}
+myname <- "Leidy Creek"
+```
+
+Inspect PASTA time series
+```{r}
+dat_pasta_trimmed %>% 
+  filter(UpdatedName == myname) %>%
+  ggplot(aes(x = doy, y = amplitude_ratio)) + 
+  geom_point() + 
+  facet_wrap(~year) + ylim(0,1) + 
+  geom_smooth(se = FALSE) +
+  theme_bw()
+
+dat_pasta_trimmed %>% 
+  filter(UpdatedName == myname) %>%
+  ggplot(aes(x = doy, y = phase_lag)) + 
+  geom_point(color = "red") + 
+  facet_wrap(~year) + 
+  geom_smooth(se = FALSE, color = "black") +
+  theme_bw()
+```
+
+What is the relationship between amplitude ratio and phase lag?
+```{r}
+dat_pasta_trimmed %>% 
+  filter(UpdatedName == myname) %>%
+  ggplot(aes(x = amplitude_ratio, y = phase_lag)) + 
+  geom_point() + 
+  facet_wrap(~year) +
+  xlim(0,1) + ylim(-5,10) + 
+  geom_smooth(se = FALSE) +
+  theme_bw()
+```
+
+Does this hold for summer months (June - September)? No: negative association between Ar and Pl is driven by ~extreme values during winter and early spring. 
+```{r}
+dat_pasta_trimmed %>% 
+  filter(UpdatedName == myname, month %in% c(6:9)) %>%
+  ggplot(aes(x = amplitude_ratio, y = phase_lag)) + 
+  geom_point() + 
+  facet_wrap(~year) +
+  xlim(0,1) + ylim(-5,10) + 
+  geom_smooth(se = FALSE) +
+  theme_bw()
+```
+
 
 ### Streamflow
 
@@ -122,7 +202,7 @@ flow_monthly %>%
 
 ### Summarize data
 
-Summarize PASTA by month 
+Summarize PASTA by month. Note that we filter to June-September and >= 2020, i.e., months/years with substantial data. Also, again, only considering the sites in Kevin's temp model (removes high density temperature observations on some streams, loggers in springs, etc.)
 ```{r}
 dat_pasta_monthly <- dat_pasta %>% 
   filter(R2_water >= 0.8, R2_air >= 0.8, !is.na(gw_influence)) %>%
@@ -143,6 +223,15 @@ dat_pasta_monthly <- dat_pasta %>%
   filter(!UpdatedName %in% c("Lake Creek")) # drop sites that we don't expect to conform to typical paired air-water temp dynamics
 ```
 
+View distributions of summer mean PASTA parameters (some sites with multiple years). Note the problematic phase_lags (negative and >5)
+```{r}
+egg::ggarrange(dat_pasta_monthly %>% ggplot() + geom_histogram(aes(amplitude_ratio)),
+               dat_pasta_monthly %>% ggplot() + geom_histogram(aes(phase_lag)),
+               dat_pasta_monthly %>% ggplot() + geom_histogram(aes(mean_offset)),
+               dat_pasta_monthly %>% ggplot() + geom_histogram(aes(mean_ratio)),
+               nrow = 2, ncol = 2)
+```
+
 
 View pairs plot between groundwater influence, total monthly yield, watershed area, and month
 ```{r}
@@ -154,7 +243,9 @@ ggpairs(dat_pasta_monthly %>% select(gw_influence_log, Yield_mm_log, h2oAreaKm2_
 * Strong correlation between month and total Yield: volumetric streamflow declines from June to September. Month ~is a proxy for water availability.
 
 
-### Model by month/year
+### Amplitude ratio
+
+#### Model by month/year
 
 Facet by year and month
 ```{r fig.width=7, fig.height=9}
@@ -181,7 +272,7 @@ coef(mymod)$month
 *Relationship between groundwater and amplitude ratio is generally negative, with the strongest negative effects typically seen in August and during the driest year (2021)*
 
 
-### Model by covariates
+#### Model by covariates
 
 Visualize relationships between amplitude ratio and (log) groundwater influence, (log) total monthly yield, and (log) watershed area.
 ```{r}
@@ -204,7 +295,7 @@ egg::ggarrange(
   nrow = 1)
 ```
 
-#### Simple model
+##### Simple model
 
 Simple linear model with additive effects
 ```{r eval=FALSE}
@@ -218,7 +309,7 @@ summary(mymod)
 ```
 
 
-#### By GW and flow
+##### By GW and flow
 
 *No random effects*
 
@@ -248,8 +339,7 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_pre
 ```
 
 
-
-#### By GW and watershed area
+##### By GW and area
 
 *No random effects*
 
@@ -279,14 +369,17 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_p
 ```
 
 
-#### Full interaction
+##### Full interaction
 
+*No random effects*. 
+
+Fit the model: interactions between groundwater x watershed area and groundwater x flow volume. (with a 3-way interaction, no significant effects)
 ```{r}
 mymod <- lm(amplitude_ratio ~ gw_influence_log*h2oAreaKm2_log + gw_influence_log*Yield_mm_log, dat_pasta_monthly)
 summary(mymod)
 ```
 
-Plot interactive effects: watershed area
+Plot interactive effects: watershed area (note that these interactive effects are generally similar to those above)
 ```{r}
 x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
 x2 <- seq(min(dat_pasta_monthly$h2oAreaKm2_log), max(dat_pasta_monthly$h2oAreaKm2_log), length.out = 100)
@@ -305,8 +398,6 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_p
   ) +
   theme_bw()
 ```
-
-
 
 Plot interactive effects: total yield
 ```{r}
@@ -327,3 +418,159 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_pre
   ) +
   theme_bw()
 ```
+
+
+
+### Phase lag
+
+Trim to only "good" phase lag estimates. Roughly half the number of observations.
+```{r}
+dat_pasta_monthly_trimmed <- dat_pasta_monthly %>% left_join(noflag) %>% filter(phase_lag_flag == 0)
+
+ggpairs(dat_pasta_monthly_trimmed %>% select(gw_influence_log, Yield_mm_log, h2oAreaKm2_log, month))
+
+```
+
+Plot relationship between key parameters: no relationship...is this weird? Not necessarily given that the negative correlations between amplitude ratio and phase lag are driven by extreme values during ~winter
+```{r fig.width=7, fig.height=7}
+egg::ggarrange(dat_pasta_monthly_trimmed %>% ggplot(aes(x = amplitude_ratio, y = phase_lag)) + geom_point(),
+               dat_pasta_monthly_trimmed %>% ggplot(aes(x = amplitude_ratio, y = mean_offset)) + geom_point(),
+               dat_pasta_monthly_trimmed %>% ggplot(aes(x = phase_lag, y = mean_offset)) + geom_point(),
+               nrow = 2, ncol = 2)
+```
+
+
+#### Model by month/year
+
+Facet by year and month
+```{r fig.width=7, fig.height=9}
+dat_pasta_monthly_trimmed %>% 
+  ggplot(aes(x = gw_influence_log, y = phase_lag)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(rows = vars(year), cols = vars(month)) + 
+  theme_bw() + theme(panel.grid = element_blank())
+```
+
+Fit random slope and intercept model, by month and year
+```{r}
+mymod <- lmerTest::lmer(phase_lag ~ gw_influence_log + (gw_influence_log | month + year + UpdatedName), data = dat_pasta_monthly_trimmed)
+summary(mymod)
+```
+
+View coefficients
+```{r}
+coef(mymod)$year
+coef(mymod)$month
+```
+
+*Relationship between groundwater and amplitude ratio is generally negative, with the strongest negative effects typically seen in August and during the driest year (2021)*
+
+
+#### Model by covariates
+
+Visualize relationships between amplitude ratio and (log) groundwater influence, (log) total monthly yield, and (log) watershed area.
+```{r}
+egg::ggarrange(
+  dat_pasta_monthly_trimmed %>% 
+    ggplot(aes(x = gw_influence_log, y = phase_lag)) +
+    geom_point() +
+    geom_smooth(method = "lm") + 
+    theme_bw() + theme(panel.grid = element_blank()), 
+  dat_pasta_monthly_trimmed %>% 
+    ggplot(aes(x = Yield_mm_log, y = phase_lag)) +
+    geom_point() +
+    geom_smooth(method = "lm") + 
+    theme_bw() + theme(panel.grid = element_blank()),
+  dat_pasta_monthly_trimmed %>% 
+    ggplot(aes(x = h2oAreaKm2_log, y = phase_lag)) +
+    geom_point() +
+    geom_smooth(method = "lm") + 
+    theme_bw() + theme(panel.grid = element_blank()),
+  nrow = 1)
+```
+
+##### Simple model
+
+Simple linear model with additive effects
+```{r eval=FALSE}
+summary(lm(phase_lag ~ gw_influence_log + Yield_mm_log + h2oAreaKm2_log, dat_pasta_monthly_trimmed))
+```
+
+Additive effects with random intercept for year
+```{r}
+mymod <- lmerTest::lmer(phase_lag ~ gw_influence_log + Yield_mm_log + h2oAreaKm2_log + (1 | year), data = dat_pasta_monthly_trimmed)
+summary(mymod)
+```
+
+
+##### By GW and flow
+
+*No random effects*
+
+Simple linear model, groundwater * flow volume 
+```{r}
+mymod <- lm(phase_lag ~ gw_influence_log*Yield_mm_log, dat_pasta_monthly_trimmed)
+summary(mymod)
+```
+
+Plot interactive effects
+```{r}
+x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$Yield_mm_log), max(dat_pasta_monthly$Yield_mm_log), length.out = 100)
+
+prediction_grid <- expand.grid(gw_influence_log = x1, Yield_mm_log = x2)
+prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
+
+ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_predicted)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
+  labs(
+    x = "(log) groundwater influence",
+    y = "(log) total yield",
+    fill = "monthly mean\nphase lag"
+  ) +
+  theme_bw()
+```
+
+
+##### By GW and area
+
+*No random effects*
+
+Simple linear model, groundwater * watershed area
+```{r}
+mymod <- lm(phase_lag ~ gw_influence_log*h2oAreaKm2_log, dat_pasta_monthly_trimmed)
+summary(mymod)
+```
+
+Plot interactive effects
+```{r}
+x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$h2oAreaKm2_log), max(dat_pasta_monthly$h2oAreaKm2_log), length.out = 100)
+
+prediction_grid <- expand.grid(gw_influence_log = x1, h2oAreaKm2_log = x2)
+prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
+
+ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_predicted)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
+  labs(
+    x = "(log) groundwater influence",
+    y = "(log) watershed area",
+    fill = "monthly mean\nphase lag"
+  ) +
+  theme_bw()
+```
+
+
+##### Full interaction
+
+*No random effects*. 
+
+Fit the model: interactions between groundwater x watershed area and groundwater x flow volume. (with a 3-way interaction, no significant effects)
+```{r}
+mymod <- lm(phase_lag ~ gw_influence_log*h2oAreaKm2_log + gw_influence_log*Yield_mm_log, dat_pasta_monthly_trimmed)
+summary(mymod)
+```
+
