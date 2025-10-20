@@ -11,6 +11,9 @@ library(fasstr)
 library(GGally)
 library(dygraphs)
 library(ggforce)
+library(sf)
+library(daymetr)
+library(mapview)
 ```
 
 
@@ -43,9 +46,22 @@ dat_sites <- read_csv("Stream temperature/model_obs_pred_data.csv") %>%
 dat_sites
 ```
 
+Get location data
+```{r}
+sites_sp <- st_read("Stream Temperature/WySEaSON_SnakeGreys_StreamTemperature_locations.shp") %>%
+  filter(name %in% unique(dat_sites$UpdatedName))
+mapview(sites_sp)
+```
+
+
 View histogram of site-specific groundwater influence. Note: these are only available for the sites Kevin included in the daily stream temperature model. This excludes sites in the Grey's river drainage, loggers deployed in groundwater spring seeps, and redundant sites (streams within 2+ loggers in close proximity).
 ```{r}
 dat_sites %>% ggplot() + geom_histogram(aes(gw_influence))
+```
+
+Histogram of site-specific catchment size
+```{r}
+dat_sites %>% ggplot() + geom_histogram(aes(h2oAreaKm2_log))
 ```
 
 
@@ -198,6 +214,45 @@ flow_monthly %>%
 ```
 
 
+### Climate
+
+Pull site-specific climate data from Daymet
+```{r eval=FALSE}
+climlist <- vector("list", length = dim(sites_sp)[1])
+for (i in 1:dim(sites_sp)[1]) {
+  clim <- download_daymet(site = sites_sp$name[i], lat = sites_sp$latitude[i], lon = sites_sp$longitude[i], start = min(year(dat_pasta_trimmed$date))-1, end = max(year(dat_pasta_trimmed$date)), internal = T)
+  climlist[[i]] <- tibble(clim$data) %>% 
+    mutate(air_temp_mean = (tmax..deg.c. + tmin..deg.c.)/2, 
+           date = as.Date(paste(year, yday, sep = "-"), "%Y-%j"),
+           UpdatedName = sites_sp$name[i]) %>%
+    select(12,2,11,10,4,6,3,5) %>% rename(precip_mmday = 5, swe_kgm2 = 6, daylength_sec = 7, shortrad_wm2 = 8)
+  print(i)
+}
+climdf <- do.call(rbind, climlist)
+climdf <- add_date_variables(climdf, dates = date, water_year_start = 10) %>% rename(month = Month)
+write_csv(climdf, "Air temperature/Daymet_daily.csv")
+```
+
+```{r}
+dat_climate <- read_csv("Air temperature/Daymet_daily.csv") %>%
+  group_by(UpdatedName, WaterYear) %>% 
+  summarize(swe_mean = mean(swe_kgm2),
+            swe_sum = sum(swe_kgm2),
+            swe_apr1 = swe_kgm2[yday == 91]) %>%
+  ungroup() %>%
+  left_join(read_csv("Air temperature/Daymet_daily.csv") %>%
+              filter(yday >= 152 & yday <= 273) %>%
+              group_by(UpdatedName, WaterYear, month) %>% 
+              summarize(precip_mean = mean(precip_mmday),
+                        precip_sum = sum(precip_mmday)) %>%
+              ungroup()
+    ) %>% 
+  select(UpdatedName, WaterYear, month, swe_mean, swe_sum, swe_apr1, precip_mean, precip_sum) %>%
+  rename(year = WaterYear)
+ggpairs(dat_climate %>% select(4:8) )
+```
+
+
 ## Model PASTA
 
 ### Summarize data
@@ -220,6 +275,9 @@ dat_pasta_monthly <- dat_pasta %>%
   left_join(flow_monthly) %>%
   mutate(gw_influence_log = log(gw_influence),
          Yield_mm_log = log(Yield_mm)) %>%
+  left_join(dat_climate) %>%
+  mutate(swe_apr1_log = log(swe_apr1+0.01),
+         precip_sum_log = log(precip_sum+0.01)) %>%
   filter(!UpdatedName %in% c("Lake Creek")) # drop sites that we don't expect to conform to typical paired air-water temp dynamics
 ```
 
@@ -235,11 +293,12 @@ egg::ggarrange(dat_pasta_monthly %>% ggplot() + geom_histogram(aes(amplitude_rat
 
 View pairs plot between groundwater influence, total monthly yield, watershed area, and month
 ```{r}
-ggpairs(dat_pasta_monthly %>% select(gw_influence_log, Yield_mm_log, h2oAreaKm2_log, month))
+ggpairs(dat_pasta_monthly %>% select(gw_influence_log, Yield_mm_log, h2oAreaKm2_log, swe_apr1_log, precip_sum_log, month))
 ```
 
 
 * Weak correlation between watershed area and groundwater influence: groundwater-dominated streams tend to be smaller.
+* Weak correlation between groundwater influence and April 1 SWE: sites with strong groundwater influence tend to be at lower elevations, which receive less snowfall.
 * Strong correlation between month and total Yield: volumetric streamflow declines from June to September. Month ~is a proxy for water availability.
 
 
@@ -274,21 +333,42 @@ coef(mymod)$month
 
 #### Model by covariates
 
+Standardize covariates
+```{r}
+dat_pasta_monthly <- dat_pasta_monthly %>%
+  mutate(z_gw_influence_log = c(scale(gw_influence_log)),
+         z_yield_mm_log = c(scale(Yield_mm_log)),
+         z_h2oareakm2_log = c(scale(h2oAreaKm2_log)),
+         z_swe_apr1_log = c(scale(swe_apr1_log)),
+         z_precip_sum = c(scale(precip_sum)))
+```
+
+
 Visualize relationships between amplitude ratio and (log) groundwater influence, (log) total monthly yield, and (log) watershed area.
 ```{r}
 egg::ggarrange(
   dat_pasta_monthly %>% 
-    ggplot(aes(x = gw_influence_log, y = amplitude_ratio)) +
+    ggplot(aes(x = z_gw_influence_log, y = amplitude_ratio)) +
     geom_point() +
     geom_smooth(method = "lm") + 
     theme_bw() + theme(panel.grid = element_blank()), 
   dat_pasta_monthly %>% 
-    ggplot(aes(x = Yield_mm_log, y = amplitude_ratio)) +
+    ggplot(aes(x = z_yield_mm_log, y = amplitude_ratio)) +
     geom_point() +
     geom_smooth(method = "lm") + 
     theme_bw() + theme(panel.grid = element_blank()),
   dat_pasta_monthly %>% 
-    ggplot(aes(x = h2oAreaKm2_log, y = amplitude_ratio)) +
+    ggplot(aes(x = z_h2oareakm2_log, y = amplitude_ratio)) +
+    geom_point() +
+    geom_smooth(method = "lm") + 
+    theme_bw() + theme(panel.grid = element_blank()),
+  dat_pasta_monthly %>% 
+    ggplot(aes(x = z_swe_apr1_log, y = amplitude_ratio)) +
+    geom_point() +
+    geom_smooth(method = "lm") + 
+    theme_bw() + theme(panel.grid = element_blank()),
+  dat_pasta_monthly %>% 
+    ggplot(aes(x = z_precip_sum, y = amplitude_ratio)) +
     geom_point() +
     geom_smooth(method = "lm") + 
     theme_bw() + theme(panel.grid = element_blank()),
@@ -299,12 +379,12 @@ egg::ggarrange(
 
 Simple linear model with additive effects
 ```{r eval=FALSE}
-summary(lm(amplitude_ratio ~ gw_influence_log + Yield_mm_log + h2oAreaKm2_log, dat_pasta_monthly))
+summary(lm(amplitude_ratio ~ z_gw_influence_log + z_yield_mm_log + z_h2oareakm2_log + z_swe_apr1_log + z_precip_sum, dat_pasta_monthly))
 ```
 
 Additive effects with random intercept for year
 ```{r}
-mymod <- lmerTest::lmer(amplitude_ratio ~ gw_influence_log + Yield_mm_log + h2oAreaKm2_log + (1 | year), data = dat_pasta_monthly)
+mymod <- lmerTest::lmer(amplitude_ratio ~ z_gw_influence_log + z_yield_mm_log + z_h2oareakm2_log + z_swe_apr1_log + z_precip_sum + (1 | UpdatedName), data = dat_pasta_monthly)
 summary(mymod)
 ```
 
@@ -315,26 +395,92 @@ summary(mymod)
 
 Simple linear model, groundwater + flow volume 
 ```{r}
-mymod <- lm(amplitude_ratio ~ gw_influence_log*Yield_mm_log, dat_pasta_monthly)
+mymod <- lm(amplitude_ratio ~ z_gw_influence_log*z_yield_mm_log, dat_pasta_monthly)
 summary(mymod)
+sqrt(mean(mymod$residuals^2))
 ```
 
 Plot interactive effects
 ```{r}
-x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
-x2 <- seq(min(dat_pasta_monthly$Yield_mm_log), max(dat_pasta_monthly$Yield_mm_log), length.out = 100)
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_yield_mm_log), max(dat_pasta_monthly$z_yield_mm_log), length.out = 100)
 
-prediction_grid <- expand.grid(gw_influence_log = x1, Yield_mm_log = x2)
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_yield_mm_log = x2)
 prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
 
-ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_predicted)) +
-  geom_tile() +
+ggplot() +
+  geom_tile(prediction_grid, mapping = aes(x = z_gw_influence_log, y = z_yield_mm_log, fill = y_predicted)) +
   scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
   labs(
     x = "(log) groundwater influence",
     y = "(log) total yield",
     fill = "monthly mean\namplitude ratio"
   ) +
+  geom_point(dat_pasta_monthly, mapping = aes(x = z_gw_influence_log, y = z_yield_mm_log), size = 0.2) +
+  theme_bw()
+```
+
+
+##### By GW and winter snow
+
+*No random effects*
+
+Simple linear model, groundwater + winter snow
+```{r}
+mymod <- lm(amplitude_ratio ~ z_gw_influence_log*z_swe_apr1_log, dat_pasta_monthly)
+summary(mymod)
+sqrt(mean(mymod$residuals^2))
+```
+
+Plot interactive effects
+```{r}
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_swe_apr1_log), max(dat_pasta_monthly$z_swe_apr1_log), length.out = 100)
+
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_swe_apr1_log = x2)
+prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
+
+ggplot() +
+  geom_tile(prediction_grid, mapping = aes(x = z_gw_influence_log, y = z_swe_apr1_log, fill = y_predicted)) +
+  scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
+  labs(
+    x = "(log) groundwater influence",
+    y = "(log) April 1 SWE",
+    fill = "monthly mean\namplitude ratio"
+  ) +
+  geom_point(dat_pasta_monthly, mapping = aes(x = z_gw_influence_log, y = z_swe_apr1_log), size = 0.2) + 
+  theme_bw()
+```
+
+
+##### By GW and summer precip
+
+*No random effects*
+
+Simple linear model, groundwater + summer precip
+```{r}
+mymod <- lm(amplitude_ratio ~ z_gw_influence_log*z_precip_sum, dat_pasta_monthly)
+summary(mymod)
+sqrt(mean(mymod$residuals^2))
+```
+
+Plot interactive effects
+```{r}
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_precip_sum), max(dat_pasta_monthly$z_precip_sum), length.out = 100)
+
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_precip_sum = x2)
+prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
+
+ggplot() +
+  geom_tile(prediction_grid, mapping = aes(x = z_gw_influence_log, y = z_precip_sum, fill = y_predicted)) +
+  scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
+  labs(
+    x = "(log) groundwater influence",
+    y = "Cumulative summer precip. (mm)",
+    fill = "monthly mean\namplitude ratio"
+  ) +
+  geom_point(dat_pasta_monthly, mapping = aes(x = z_gw_influence_log, y = z_precip_sum), size = 0.2) +
   theme_bw()
 ```
 
@@ -345,26 +491,28 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_pre
 
 Simple linear model, groundwater + flow volume 
 ```{r}
-mymod <- lm(amplitude_ratio ~ gw_influence_log*h2oAreaKm2_log, dat_pasta_monthly)
+mymod <- lm(amplitude_ratio ~ z_gw_influence_log*z_h2oareakm2_log, dat_pasta_monthly)
 summary(mymod)
+sqrt(mean(mymod$residuals^2))
 ```
 
 Plot interactive effects
 ```{r}
-x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
-x2 <- seq(min(dat_pasta_monthly$h2oAreaKm2_log), max(dat_pasta_monthly$h2oAreaKm2_log), length.out = 100)
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_h2oareakm2_log), max(dat_pasta_monthly$z_h2oareakm2_log), length.out = 100)
 
-prediction_grid <- expand.grid(gw_influence_log = x1, h2oAreaKm2_log = x2)
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_h2oareakm2_log = x2)
 prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
 
-ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_predicted)) +
-  geom_tile() +
+ggplot() +
+  geom_tile(prediction_grid, mapping = aes(x = z_gw_influence_log, y = z_h2oareakm2_log, fill = y_predicted)) +
   scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
   labs(
     x = "(log) groundwater influence",
     y = "(log) watershed area",
     fill = "monthly mean\namplitude ratio"
   ) +
+  geom_point(dat_pasta_monthly, mapping = aes(x = z_gw_influence_log, y = z_h2oareakm2_log), size = 0.2) +
   theme_bw()
 ```
 
@@ -375,20 +523,24 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_p
 
 Fit the model: interactions between groundwater x watershed area and groundwater x flow volume. (with a 3-way interaction, no significant effects)
 ```{r}
-mymod <- lm(amplitude_ratio ~ gw_influence_log*h2oAreaKm2_log + gw_influence_log*Yield_mm_log, dat_pasta_monthly)
+mymod <- lm(amplitude_ratio ~ z_gw_influence_log*z_h2oareakm2_log + z_gw_influence_log*z_yield_mm_log + z_gw_influence_log*z_swe_apr1_log + z_gw_influence_log*z_precip_sum, dat_pasta_monthly)
 summary(mymod)
 ```
 
-Plot interactive effects: watershed area (note that these interactive effects are generally similar to those above)
-```{r}
-x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
-x2 <- seq(min(dat_pasta_monthly$h2oAreaKm2_log), max(dat_pasta_monthly$h2oAreaKm2_log), length.out = 100)
+::: panel-tabset
 
-prediction_grid <- expand.grid(gw_influence_log = x1, h2oAreaKm2_log = x2)
-prediction_grid$Yield_mm_log <- mean(dat_pasta_monthly$Yield_mm_log)
+###### watershed area
+```{r}
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_h2oareakm2_log), max(dat_pasta_monthly$z_h2oareakm2_log), length.out = 100)
+
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_h2oareakm2_log = x2)
+prediction_grid$z_yield_mm_log <- 0
+prediction_grid$z_swe_apr1_log <- 0
+prediction_grid$z_precip_sum <- 0
 prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
 
-ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_predicted)) +
+ggplot(prediction_grid, aes(x = z_gw_influence_log, y = z_h2oareakm2_log, fill = y_predicted)) +
   geom_tile() +
   scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
   labs(
@@ -399,16 +551,18 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = h2oAreaKm2_log, fill = y_p
   theme_bw()
 ```
 
-Plot interactive effects: total yield
+###### total yield
 ```{r}
-x1 <- seq(min(dat_pasta_monthly$gw_influence_log), max(dat_pasta_monthly$gw_influence_log), length.out = 100)
-x2 <- seq(min(dat_pasta_monthly$Yield_mm_log), max(dat_pasta_monthly$Yield_mm_log), length.out = 100)
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_yield_mm_log), max(dat_pasta_monthly$z_yield_mm_log), length.out = 100)
 
-prediction_grid <- expand.grid(gw_influence_log = x1, Yield_mm_log = x2)
-prediction_grid$h2oAreaKm2_log <- mean(dat_pasta_monthly$h2oAreaKm2_log)
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_yield_mm_log = x2)
+prediction_grid$z_h2oareakm2_log <- 0
+prediction_grid$z_swe_apr1_log <- 0
+prediction_grid$z_precip_sum <- 0
 prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
 
-ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_predicted)) +
+ggplot(prediction_grid, aes(x = z_gw_influence_log, y = z_yield_mm_log, fill = y_predicted)) +
   geom_tile() +
   scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
   labs(
@@ -418,6 +572,54 @@ ggplot(prediction_grid, aes(x = gw_influence_log, y = Yield_mm_log, fill = y_pre
   ) +
   theme_bw()
 ```
+
+###### april 1 swe
+```{r}
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_swe_apr1_log), max(dat_pasta_monthly$z_swe_apr1_log), length.out = 100)
+
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_swe_apr1_log = x2)
+prediction_grid$z_h2oareakm2_log <- 0
+prediction_grid$z_yield_mm_log <- 0
+prediction_grid$z_precip_sum <- 0
+prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
+
+ggplot(prediction_grid, aes(x = z_gw_influence_log, y = z_swe_apr1_log, fill = y_predicted)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
+  labs(
+    x = "(log) groundwater influence",
+    y = "(log) April 1 SWE",
+    fill = "monthly mean\namplitude ratio"
+  ) +
+  theme_bw()
+```
+
+###### summer precip
+```{r}
+x1 <- seq(min(dat_pasta_monthly$z_gw_influence_log), max(dat_pasta_monthly$z_gw_influence_log), length.out = 100)
+x2 <- seq(min(dat_pasta_monthly$z_precip_sum), max(dat_pasta_monthly$z_precip_sum), length.out = 100)
+
+prediction_grid <- expand.grid(z_gw_influence_log = x1, z_precip_sum = x2)
+prediction_grid$z_h2oareakm2_log <- 0
+prediction_grid$z_swe_apr1_log <- 0
+prediction_grid$z_yield_mm_log <- 0
+prediction_grid$y_predicted <- predict(mymod, newdata = prediction_grid)
+
+ggplot(prediction_grid, aes(x = z_gw_influence_log, y = z_precip_sum, fill = y_predicted)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "plasma") + # Use a color scale, e.g., viridis
+  labs(
+    x = "(log) groundwater influence",
+    y = "Cumulative summer precip. (mm)",
+    fill = "monthly mean\namplitude ratio"
+  ) +
+  theme_bw()
+```
+
+:::
+
+
 
 
 
